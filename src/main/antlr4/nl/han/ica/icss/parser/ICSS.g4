@@ -28,6 +28,8 @@ property
     : Identifier
     ;
 
+// TODO
+// Values types toevoegen (colors, resolutie, namen, getalen)
 value
     : Identifier
     ;
