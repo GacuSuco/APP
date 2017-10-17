@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_icsstool" default="compile.module.icsstool">
+  <dirname property="module.icsstool.basedir" file="${ant.file.module_icsstool}"/>
+  
+  <property name="module.jdk.home.icsstool" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.icsstool" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.icsstool" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.icsstool" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="icsstool.output.dir" value="${module.icsstool.basedir}/target/classes"/>
+  <property name="icsstool.testoutput.dir" value="${module.icsstool.basedir}/target/test-classes"/>
+  
+  <path id="icsstool.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="icsstool.module.production.classpath">
+    <path refid="${module.jdk.classpath.icsstool}"/>
+    <path refid="library.maven:_org.antlr:antlr4-runtime:4.7.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:23.0.classpath"/>
+    <path refid="library.maven:_com.google.code.findbugs:jsr305:1.3.9.classpath"/>
+    <path refid="library.maven:_com.google.errorprone:error_prone_annotations:2.0.18.classpath"/>
+    <path refid="library.maven:_com.google.j2objc:j2objc-annotations:1.1.classpath"/>
+    <path refid="library.maven:_org.codehaus.mojo:animal-sniffer-annotations:1.14.classpath"/>
+  </path>
+  
+  <path id="icsstool.runtime.production.module.classpath">
+    <pathelement location="${icsstool.output.dir}"/>
+    <path refid="library.maven:_org.antlr:antlr4-runtime:4.7.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:23.0.classpath"/>
+    <path refid="library.maven:_com.google.code.findbugs:jsr305:1.3.9.classpath"/>
+    <path refid="library.maven:_com.google.errorprone:error_prone_annotations:2.0.18.classpath"/>
+    <path refid="library.maven:_com.google.j2objc:j2objc-annotations:1.1.classpath"/>
+    <path refid="library.maven:_org.codehaus.mojo:animal-sniffer-annotations:1.14.classpath"/>
+  </path>
+  
+  <path id="icsstool.module.classpath">
+    <path refid="${module.jdk.classpath.icsstool}"/>
+    <pathelement location="${icsstool.output.dir}"/>
+    <path refid="library.maven:_org.antlr:antlr4-runtime:4.7.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:23.0.classpath"/>
+    <path refid="library.maven:_com.google.code.findbugs:jsr305:1.3.9.classpath"/>
+    <path refid="library.maven:_com.google.errorprone:error_prone_annotations:2.0.18.classpath"/>
+    <path refid="library.maven:_com.google.j2objc:j2objc-annotations:1.1.classpath"/>
+    <path refid="library.maven:_org.codehaus.mojo:animal-sniffer-annotations:1.14.classpath"/>
+  </path>
+  
+  <path id="icsstool.runtime.module.classpath">
+    <pathelement location="${icsstool.testoutput.dir}"/>
+    <pathelement location="${icsstool.output.dir}"/>
+    <path refid="library.maven:_org.antlr:antlr4-runtime:4.7.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:23.0.classpath"/>
+    <path refid="library.maven:_com.google.code.findbugs:jsr305:1.3.9.classpath"/>
+    <path refid="library.maven:_com.google.errorprone:error_prone_annotations:2.0.18.classpath"/>
+    <path refid="library.maven:_com.google.j2objc:j2objc-annotations:1.1.classpath"/>
+    <path refid="library.maven:_org.codehaus.mojo:animal-sniffer-annotations:1.14.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.icsstool">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.icsstool">
+    <patternset refid="excluded.from.module.icsstool"/>
+  </patternset>
+  
+  <path id="icsstool.module.sourcepath">
+    <dirset dir="${module.icsstool.basedir}">
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+      <include name="target/generated-sources/antlr4"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.icsstool" depends="compile.module.icsstool.production,compile.module.icsstool.tests" description="Compile module icsstool"/>
+  
+  <target name="compile.module.icsstool.production" depends="register.custom.compilers" description="Compile module icsstool; production classes">
+    <mkdir dir="${icsstool.output.dir}"/>
+    <javac2 destdir="${icsstool.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.icsstool}/javac">
+      <compilerarg line="${compiler.args.icsstool}"/>
+      <bootclasspath refid="icsstool.module.bootclasspath"/>
+      <classpath refid="icsstool.module.production.classpath"/>
+      <src refid="icsstool.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.icsstool"/>
+    </javac2>
+    
+    <copy todir="${icsstool.output.dir}">
+      <fileset dir="${module.icsstool.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.icsstool.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.icsstool.basedir}/target/generated-sources/antlr4">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.icsstool.tests" depends="register.custom.compilers,compile.module.icsstool.production" description="compile module icsstool; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.icsstool" description="cleanup module">
+    <delete dir="${icsstool.output.dir}"/>
+    <delete dir="${icsstool.testoutput.dir}"/>
+  </target>
+</project>
