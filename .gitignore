@@ -1,2 +1,7 @@
 # Kut IntelliJ IDEA map
 .idea
+target
+
+# Antlr
+gen
+
