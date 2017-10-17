@@ -1,37 +1,93 @@
 grammar ICSS;
 
-//stylesheet: WS rule_set+ EOF;
+//Parsers
+stylesheet
+    : ruleSet+
+      EOF
+    ;
 
-stylesheet:rule_set+;
+// eerst wordt er gekeken naar de selector, dit kunnen meerdere zijn geschijde van een comma;
+ruleSet
+    : selector (Comma selector)*
+        LBrace
+           declarationList
+        RBrace
+    ;
+declarationList
+     :(Semi)*                  // eventuele overgebleven (;)
+      declaration              // prop zelf
+      (Semi declaration?)*     // eventuele (;) en volgende prop;
+    ;
 
-rule_set:selector '{'(ws) properties (ws)'}';
-selector:(Selctor_Id | Selctor_Class | (CharNum+))(ws);
-properties:property+;
-property: (ws)PROPERTY_NAME Colon (ws) PROPERTY_VALUE Semicom;
-ws: (Space)*;
-
-
-PROPERTY_VALUE: Color | Size | String;
-PROPERTY_NAME: CharNum+ |CharNum+[-]CharNum+;
-
-Size: [0-9]*('px' | '%');
-Color:Hash [a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9];
-String:'"'.*?'"';
-
-Selctor_Id:Hash CharNum+;
-Selctor_Class:Dot CharNum+;
-
-CharNum: 'a'..'z' | 'A'..'Z' | '0'..'9';
-Hash: '#';
-Dot:'.';
-Colon: ':';
-Semicom:';';
-Space:[ \t\r\n\f]+;
+declaration
+    : property Colon value
+    ;
 
 
+property
+    : Identifier
+    ;
+
+value
+    : Identifier
+    ;
 
 
-WS: [ \f\t\r\n]+ -> skip;
-//SPACE:' '|'\t'|'\f';
-NEWLINE:'\r'? '\n' | '\r';
+// selectors need: element name, id , class
+selector
+    : (elementSubsequent)+
+    ;
 
+elementSubsequent
+    : className
+    | elementName
+    ;
+
+
+className
+    : Dot Identifier
+    ;
+
+elementName
+    : Identifier
+    ;
+
+//Lexers
+// Fragments
+fragment HEX    : [0-9a-fA-F] ;
+fragment CHAR   : 'a'..'z'
+                | 'A'..'Z'
+                | '_' ;
+fragment NMCHAR : 'a'..'z'
+                | 'A'..'Z'
+                | '0'..'9'
+                | '_'
+                | Minus ;
+
+fragment NAME   : NMCHAR+ ;
+
+// Basic special char
+Hash            : '#' ;
+Greater         : '>' ;
+LBrace          : '{' ;
+RBrace          : '}' ;
+LBracket        : '[' ;
+RBracket        : ']' ;
+Equal           : '=' ;
+Semi            : ';' ;
+Colon           : ':' ;
+Solidus         : '/' ;
+Minus           : '-' ;
+Plus            : '+' ;
+Star            : '*' ;
+LParen          : '(' ;
+RParen          : ')' ;
+Comma           : ',' ;
+Dot             : '.' ;
+
+// tja, spreekt voor zichzelf he!
+Number          : [0-9]+
+                | [0-9]* '.' [0-9]+;
+
+// identifier (kan properties names en values opvangen)
+Identifier      : Minus? CHAR NMCHAR* ;
