@@ -4,17 +4,21 @@ grammar ICSS;
 // - - - - - Parser - - - - - //
 ////////////////////////////////
 stylesheet
-    : ((Semi)* variableDeclaration (Semi variableDeclaration?)*)
-      (ruleSet+)*
+    : typeRuleSet*
       EOF
     ;
 
-ruleSet
+typeRuleSet
+    : styleRuleSet
+    | variableDeclaration
+    ;
+styleRuleSet
     : selector
         LBrace
             declarations
         RBrace
     ;
+
 selector
     : (selectorTag)? LowerCase_Ident
     ;
@@ -30,14 +34,14 @@ cssID
     ;
 
 declarations
-    : (Semi)* styleDeclaration (Semi styleDeclaration?)*
-    | (Semi)* variableDeclaration (Semi variableDeclaration?)*
+    : styleDeclaration*
+    | variableDeclaration*
     ;
 styleDeclaration
-    : attribute Colon expresion
+    : attribute Colon expresion Semi
     ;
 variableDeclaration
-    : variable Assigment expresion
+    : variable Assigment expresion Semi
     ;
 
 attribute
@@ -60,6 +64,7 @@ operator
 value
     : sizes
     | color
+    | boolean
     | variable;
 
 sizes
@@ -68,6 +73,10 @@ sizes
     ;
 color
     : HexColor
+    ;
+boolean
+    : TRUE
+    | FALSE
     ;
 
 ///////////////////////////////
@@ -87,6 +96,7 @@ fragment UCCHAR     : 'A'..'Z' ;
 fragment UCNMCHAR   : UnderScore
                     | 'A'..'Z'
                     | '0'..'9' ;
+
 
 Assigment           : Colon Equal ;
 Hash                : '#' ;
@@ -110,7 +120,11 @@ Dot                 : '.' ;
 
 Number              : [0-9]+;
 
+TRUE       : 'true' ;
+FALSE      : 'false' ;
+
 LowerCase_Ident     : Minus? LCCHAR LCNMCHAR*;
 UpperCase_Ident     : UnderScore? UCCHAR UCNMCHAR*;
+
 
 WS : [ \t\r\n]+ -> skip ;
