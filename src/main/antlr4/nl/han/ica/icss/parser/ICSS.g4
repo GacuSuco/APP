@@ -14,9 +14,10 @@ typeRuleSet
     ;
 styleRuleSet
     : selector
-        LBrace
+        (LBracket booleanExpresion RBracket)?
+         LBrace
             declarations
-        RBrace
+         RBrace
     ;
 
 selector
@@ -60,6 +61,22 @@ operator
     | Star
     | Solidus
     ;
+logicalOperator
+    : AND
+    | OR
+    ;
+
+comparator
+    : Greater
+    | Lesser
+    | Equal
+    ;
+
+booleanExpresion
+    : booleanExpresion logicalOperator booleanExpresion
+    | value (comparator? value)*
+    ;
+
 
 value
     : sizes
@@ -101,6 +118,7 @@ fragment UCNMCHAR   : UnderScore
 Assigment           : Colon Equal ;
 Hash                : '#' ;
 Greater             : '>' ;
+Lesser              : '<' ;
 LBrace              : '{' ;
 RBrace              : '}' ;
 LBracket            : '[' ;
@@ -120,8 +138,13 @@ Dot                 : '.' ;
 
 Number              : [0-9]+;
 
+AND        : 'AND'
+           | '&&' ;
+OR         : 'OR'
+           | '||' ;
 TRUE       : 'true' ;
 FALSE      : 'false' ;
+
 
 LowerCase_Ident     : Minus? LCCHAR LCNMCHAR*;
 UpperCase_Ident     : UnderScore? UCCHAR UCNMCHAR*;
