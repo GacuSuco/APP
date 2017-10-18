@@ -81,7 +81,7 @@ booleanExpresion
 value
     : sizes
     | color
-    | boolean
+    | bool
     | variable;
 
 sizes
@@ -91,7 +91,7 @@ sizes
 color
     : HexColor
     ;
-boolean
+bool
     : TRUE
     | FALSE
     ;
