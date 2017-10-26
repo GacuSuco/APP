@@ -5,6 +5,7 @@ import nl.han.ica.icss.checker.SemanticError;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+// SHIT MAG NIET AANGEPAST WORDEN MOET G4 HERSCHRIJVEN NAAR WAT HIER UIT MOET KOMEN.
 public class AST {
 	//The root of the tree
 	public Stylesheet root;

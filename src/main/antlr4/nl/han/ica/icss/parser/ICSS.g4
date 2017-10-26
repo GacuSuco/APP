@@ -14,35 +14,37 @@ typeRuleSet
     ;
 styleRuleSet
     : selector
-        (LBracket booleanExpresion RBracket)?
+        (LBracket booleanExpression RBracket)?
          LBrace
             declarations
          RBrace
     ;
 
 selector
-    : (selectorTag)? LowerCase_Ident
-    ;
-selectorTag
-    : cssClass
+    : selectorTag
+    | cssClass
     | cssID
     ;
 cssClass
-    : Hash
+    : Hash LowerCase_Ident
     ;
 cssID
-    : Dot
+    : Dot LowerCase_Ident
     ;
+selectorTag
+    : LowerCase_Ident
+    ;
+
 
 declarations
     : styleDeclaration*
     | variableDeclaration*
     ;
 styleDeclaration
-    : attribute Colon expresion Semi
+    : attribute Colon expression Semi
     ;
 variableDeclaration
-    : variable Assigment expresion Semi
+    : variable Assigment expression Semi
     ;
 
 attribute
@@ -52,7 +54,7 @@ variable
     : UpperCase_Ident
     ;
 
-expresion
+expression
     : value (operator? value)*
     ;
 operator
@@ -72,8 +74,8 @@ comparator
     | Equal
     ;
 
-booleanExpresion
-    : booleanExpresion logicalOperator booleanExpresion
+booleanExpression
+    : booleanExpression logicalOperator booleanExpression
     | value (comparator? value)*
     ;
 
