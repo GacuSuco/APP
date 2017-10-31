@@ -57,12 +57,12 @@ public class ASTListener extends ICSSBaseListener {
 	}
 
 	@Override
-	public void enterDeclarations(ICSSParser.DeclarationsContext ctx) {
+	public void enterStyleDeclaration(ICSSParser.StyleDeclarationContext ctx) {
 		currentContainer.push(new Declaration());
 	}
 
 	@Override
-	public void exitDeclarations(ICSSParser.DeclarationsContext ctx) {
+	public void exitStyleDeclaration(ICSSParser.StyleDeclarationContext ctx) {
 		Declaration declaration = ((Declaration) currentContainer.pop());
 		currentContainer.peek().addChild(declaration);
 	}
@@ -83,5 +83,26 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void enterPercentageLiteral(ICSSParser.PercentageLiteralContext ctx) {
 		currentContainer.peek().addChild(new PercentageLiteral(ctx.getText()));
+	}
+
+	@Override
+	public void enterVariableDeclaration(ICSSParser.VariableDeclarationContext ctx) {
+		currentContainer.push(new Declaration());
+	}
+
+	@Override
+	public void exitVariableDeclaration(ICSSParser.VariableDeclarationContext ctx) {
+		Declaration declaration = ((Declaration) currentContainer.pop());
+		currentContainer.peek().addChild(declaration);
+	}
+
+	@Override
+	public void enterVariable(ICSSParser.VariableContext ctx) {
+		if (((Declaration) currentContainer.peek()).property == null){
+			((Declaration) currentContainer.peek()).property = ctx.getText();
+		}
+		else {
+			currentContainer.peek().addChild(new VariableReference(ctx.getText()));
+		}
 	}
 }
