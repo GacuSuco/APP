@@ -96,6 +96,8 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(declaration);
 	}
 
+	// Shit omgooien !!! idee nu is dat variable, color, pixal, en perc eerst worden toegevoegt. daarnaa wordt er gekeken of operation nodig is.
+
 	@Override
 	public void enterVariable(ICSSParser.VariableContext ctx) {
 		if (((Declaration) currentContainer.peek()).property == null){
@@ -105,4 +107,30 @@ public class ASTListener extends ICSSBaseListener {
 			currentContainer.peek().addChild(new VariableReference(ctx.getText()));
 		}
 	}
+
+	@Override
+	public void enterOperator(ICSSParser.OperatorContext ctx) {
+		currentContainer.add(new Operation(Operation.Operator.fromString(ctx.getText())));
+	}
+
+
+	@Override
+	public void enterExpression(ICSSParser.ExpressionContext ctx) {
+		System.out.println(ctx.getChildCount());
+		if (ctx.getChildCount() > 1) { // wanneer count > is dan 1 heeft een operator
+			for (int i = 0; i < ctx.getChildCount(); i++) {
+				if (i% 2 != 0){
+					System.out.println("\ni'm an operator");
+					System.out.println(ctx.getChild(i).getText());
+				}else {
+					System.out.println("\ni'm an value\n" + ctx.getChild(i).getText());
+				}
+			}
+		}
+
+
+		super.enterExpression(ctx);
+	}
+
+
 }
