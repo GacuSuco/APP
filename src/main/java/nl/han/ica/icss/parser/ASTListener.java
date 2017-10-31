@@ -22,13 +22,23 @@ public class ASTListener extends ICSSBaseListener {
         return ast;
     }
 
+    @Override
 	public void enterStylesheet(ICSSParser.StylesheetContext ctx){
 		currentContainer.push(new Stylesheet());
+	}
+	@Override
+	public void exitStylesheet(ICSSParser.StylesheetContext ctx) {
+		this.ast.setRoot((Stylesheet) currentContainer.pop());
 	}
 
 	@Override
 	public void enterStyleRuleSet(ICSSParser.StyleRuleSetContext ctx) {
 		currentContainer.push(new Stylerule());
+	}
+	@Override
+	public void exitStyleRuleSet(ICSSParser.StyleRuleSetContext ctx) {
+		Stylerule stylerule = ((Stylerule) currentContainer.pop());
+		currentContainer.peek().addChild(stylerule);
 	}
 
 	@Override
@@ -52,29 +62,26 @@ public class ASTListener extends ICSSBaseListener {
 	}
 
 	@Override
+	public void exitDeclarations(ICSSParser.DeclarationsContext ctx) {
+		Declaration declaration = ((Declaration) currentContainer.pop());
+		currentContainer.peek().addChild(declaration);
+	}
+
+	@Override
 	public void enterAttribute(ICSSParser.AttributeContext ctx) {
 		((Declaration) currentContainer.peek()).property = ctx.getText();
 	}
 
-
 	@Override
 	public void enterColor(ICSSParser.ColorContext ctx) {
-		//currentContainer.peek().addChild();
+		currentContainer.peek().addChild(new ColorLiteral(ctx.getText()));
 	}
-
 	@Override
-	public void enterExpression(ICSSParser.ExpressionContext ctx) {
-		//currentContainer.peek().addChild();
+	public void enterPixelLiteral(ICSSParser.PixelLiteralContext ctx) {
+		currentContainer.peek().addChild(new PixelLiteral(ctx.getText()));
 	}
-
 	@Override
-	public void exitStylesheet(ICSSParser.StylesheetContext ctx) {
-		this.ast.setRoot((Stylesheet) currentContainer.pop());
-	}
-
-	@Override
-	public void exitStyleRuleSet(ICSSParser.StyleRuleSetContext ctx) {
-		Stylerule stylerule = ((Stylerule) currentContainer.pop());
-		currentContainer.peek().addChild(stylerule);
+	public void enterPercentageLiteral(ICSSParser.PercentageLiteralContext ctx) {
+		currentContainer.peek().addChild(new PercentageLiteral(ctx.getText()));
 	}
 }

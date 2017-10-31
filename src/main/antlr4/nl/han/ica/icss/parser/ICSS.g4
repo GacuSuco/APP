@@ -78,17 +78,17 @@ booleanExpression
     : booleanExpression logicalOperator booleanExpression
     | value (comparator? value)*
     ;
-
-
 value
-    : sizes
+    : pixelLiteral
+    | percentageLiteral
     | color
     | bool
     | variable;
-
-sizes
+pixelLiteral
     : Pixels
-    | Percentage
+    ;
+percentageLiteral
+    : Percentage
     ;
 color
     : HexColor
