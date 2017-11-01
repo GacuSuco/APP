@@ -93,7 +93,8 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void enterVariable(ICSSParser.VariableContext ctx) {
 		if (ctx.parent.getChildCount() != 1){ //maakt deel uit van de tree
-			((Declaration) currentContainer.peek()).property = ctx.getText();
+			((Assignment) currentContainer.peek()).name = new VariableReference(ctx.getText());
+			//((Declaration) currentContainer.peek()).property = ctx.getText();
 		}
 		else {
 			currentContainer.push(new VariableReference(ctx.getText()));
@@ -117,12 +118,16 @@ public class ASTListener extends ICSSBaseListener {
 
 	@Override
 	public void enterVariableDeclaration(ICSSParser.VariableDeclarationContext ctx) {
-		currentContainer.push(new Declaration());
+		currentContainer.push(new Assignment());
+		//currentContainer.push(new Declaration());
 	}
 	@Override
 	public void exitVariableDeclaration(ICSSParser.VariableDeclarationContext ctx) {
-		Declaration declaration = ((Declaration) currentContainer.pop());
-		currentContainer.peek().addChild(declaration);
+		ASTNode assignment =  currentContainer.pop();
+		currentContainer.peek().addChild(assignment);
+
+// 		Declaration declaration = ((Declaration) currentContainer.pop());
+//		currentContainer.peek().addChild(declaration);
 	}
 	@Override
 	public void exitExpression(ICSSParser.ExpressionContext ctx) {
