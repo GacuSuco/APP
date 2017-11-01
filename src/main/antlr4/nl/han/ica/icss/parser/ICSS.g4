@@ -14,10 +14,14 @@ typeRuleSet
     ;
 styleRuleSet
     : selector
-        (LBracket booleanExpression RBracket)?
+        (LBracket condition RBracket)?
          LBrace
             declarations
          RBrace
+    ;
+
+condition
+    : booleanExpression
     ;
 
 selector

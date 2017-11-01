@@ -84,6 +84,12 @@ public class ASTListener extends ICSSBaseListener {
 	public void enterPercentageLiteral(ICSSParser.PercentageLiteralContext ctx) {
 		currentContainer.push(new PercentageLiteral(ctx.getText()));
 	}
+
+	@Override
+	public void enterBool(ICSSParser.BoolContext ctx) {
+		currentContainer.push(new BoolLiteral(ctx.getText()));
+	}
+
 	@Override
 	public void enterVariable(ICSSParser.VariableContext ctx) {
 		if (ctx.parent.getChildCount() != 1){ //maakt deel uit van de tree
@@ -98,6 +104,17 @@ public class ASTListener extends ICSSBaseListener {
 	public void enterOperator(ICSSParser.OperatorContext ctx) {
 		currentContainer.add(new Operation(Operation.Operator.fromString(ctx.getText())));
 	}
+
+	@Override
+	public void enterLogicalOperator(ICSSParser.LogicalOperatorContext ctx) {
+		currentContainer.add(new Operation(Operation.Operator.fromString(ctx.getText())));
+	}
+
+	@Override
+	public void enterComparator(ICSSParser.ComparatorContext ctx) {
+		currentContainer.add(new Operation(Operation.Operator.fromString(ctx.getText())));
+	}
+
 	@Override
 	public void enterVariableDeclaration(ICSSParser.VariableDeclarationContext ctx) {
 		currentContainer.push(new Declaration());
@@ -134,5 +151,25 @@ public class ASTListener extends ICSSBaseListener {
 			ASTNode node = this.currentContainer.pop();
 			this.currentContainer.peek().addChild(node);
 		}
+	}
+
+	@Override
+	public void exitBooleanExpression(ICSSParser.BooleanExpressionContext ctx) {
+		if (ctx.getChildCount() > 1) {
+			ASTNode right = this.currentContainer.pop();
+			ASTNode operator = this.currentContainer.pop();
+			ASTNode left = this.currentContainer.pop();
+
+			((Operation)operator).rhs = (Expression) right;
+			((Operation)operator).lhs = (Expression) left;
+
+			this.currentContainer.push(operator);
+		}
+	}
+
+	@Override
+	public void exitCondition(ICSSParser.ConditionContext ctx) {
+		ASTNode node = this.currentContainer.pop();
+		this.currentContainer.peek().addChild(node);
 	}
 }
