@@ -11,7 +11,7 @@ import static nl.han.ica.icss.ast.Operation.Operator.*;
 
 public class Checker {
 
-    public enum ExpressionType {
+    public enum ExpressionType { //???
         PIXELVALUE,
         PERCENTAGE,
         COLORVALUE,
@@ -102,15 +102,15 @@ public class Checker {
         }
         else {
             if (ref == PixelLiteral.class && !pixelDeclarations.contains(declaration.property)) {
-                declaration.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
+                declaration.expression.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
                         "cannot be assigned to \"" + declaration.property + "\".");
             }
             if (ref == PercentageLiteral.class && !percentageDeclarations.contains(declaration.property)) {
-                declaration.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
+                declaration.expression.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
                         "cannot be assigned to \"" + declaration.property + "\".");
             }
             if (ref == ColorLiteral.class && !colorDeclarations.contains(declaration.property)) {
-                declaration.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
+                declaration.expression.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
                         "cannot be assigned to \"" + declaration.property + "\".");
             }
         }
