@@ -2,6 +2,7 @@ package nl.han.ica.icss.checker;
 
 import java.lang.ref.Reference;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.parser.ICSSParser;
@@ -19,8 +20,15 @@ public class Checker {
     }
 
     private HashMap<String,Assignment> symboltable;
+    private HashSet<String> pixelDeclarations;
+    private HashSet<String> percentageDeclarations;
+    private HashSet<String> colorDeclarations;
+
 
 	public void check(AST ast) {
+	    // building style type declarations
+        this.initStyleDeclarationTypes();
+
 	    //Clear symbol table
         symboltable = new HashMap<>();
 
@@ -42,6 +50,37 @@ public class Checker {
         }
 	}
 
+    private void initStyleDeclarationTypes() {
+	    this.pixelDeclarations = new HashSet<>();
+	    this.percentageDeclarations = new HashSet<>();
+	    this.colorDeclarations = new HashSet<>();
+
+	    this.pixelDeclarations.add("height");
+        this.pixelDeclarations.add("width");
+        this.pixelDeclarations.add("padding-top");
+        this.pixelDeclarations.add("padding-right");
+        this.pixelDeclarations.add("padding-bottom");
+        this.pixelDeclarations.add("padding-left");
+        this.pixelDeclarations.add("margin-top");
+        this.pixelDeclarations.add("margin-right");
+        this.pixelDeclarations.add("margin-bottom");
+        this.pixelDeclarations.add("margin-left");
+
+        this.percentageDeclarations.add("height");
+        this.percentageDeclarations.add("width");
+        this.percentageDeclarations.add("padding-top");
+        this.percentageDeclarations.add("padding-right");
+        this.percentageDeclarations.add("padding-bottom");
+        this.percentageDeclarations.add("padding-left");
+        this.percentageDeclarations.add("margin-top");
+        this.percentageDeclarations.add("margin-right");
+        this.percentageDeclarations.add("margin-bottom");
+        this.percentageDeclarations.add("margin-left");
+
+        this.colorDeclarations.add("background-color");
+        this.colorDeclarations.add("color");
+    }
+
     private void checkStyleRule(Stylerule stylerule) {
         for (ASTNode n: stylerule.getChildren()) {
             if (n.getClass() == Declaration.class){
@@ -51,17 +90,28 @@ public class Checker {
     }
 
     private void checkDeclaration(Declaration declaration) {
-        System.out.println(declaration.expression.getClass().toString());
-        if(declaration.expression.getClass() == VariableReference.class){
-            if(getVariableReferenceType(declaration.expression.getNodeLabel()) == null) {
-                declaration.expression.setError("Null reference!");
-                System.out.println("Error: Null reference!");
-            }
+	    Class<?> ref = declaration.expression.getClass();
+	    if(declaration.expression.getClass() == VariableReference.class){
+            ref = getVariableReferenceType(declaration.expression.getNodeLabel());
         }
         if (declaration.expression.getClass() == Operation.class) {
-            if(getOperationReferenceType((Operation) declaration.expression) == NullPointerException.class) {
-                declaration.expression.setError("Null reference!");
-                System.out.println("Error: Null reference!");
+            ref = getOperationReferenceType((Operation) declaration.expression);
+        }
+        if(ref == null) {
+            declaration.expression.setError("Null reference!");
+        }
+        else {
+            if (ref == PixelLiteral.class && !pixelDeclarations.contains(declaration.property)) {
+                declaration.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
+                        "cannot be assigned to \"" + declaration.property + "\".");
+            }
+            if (ref == PercentageLiteral.class && !percentageDeclarations.contains(declaration.property)) {
+                declaration.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
+                        "cannot be assigned to \"" + declaration.property + "\".");
+            }
+            if (ref == ColorLiteral.class && !colorDeclarations.contains(declaration.property)) {
+                declaration.setError("Incompatible type in declaration: \"" + ref.getSimpleName() + "\" " +
+                        "cannot be assigned to \"" + declaration.property + "\".");
             }
         }
     }
@@ -119,12 +169,8 @@ public class Checker {
         return null;
     }
 
-
-
     private void addAssignment(Assignment assignment ){
-        System.out.println("stop iets in symbol");
         symboltable.put(assignment.name.getNodeLabel(), assignment);
     }
-
 
 }
