@@ -82,9 +82,36 @@ public class Checker {
     }
 
     private void checkStyleRule(Stylerule stylerule) {
+	    if(stylerule.condition != null){
+	        this.checkCondition(stylerule.condition);
+        }
         for (ASTNode n: stylerule.getChildren()) {
             if (n.getClass() == Declaration.class){
                 checkDeclaration((Declaration) n);
+
+            }
+        }
+    }
+
+    private boolean checkCondition(Expression condition) {
+	    Class<?> ref = condition.getClass();
+        if (ref == Operation.class){
+            ref = getOperationReferenceType((Operation) condition);
+        }
+        if(ref == VariableReference.class) {
+            ref = getVariableReferenceType(condition.getNodeLabel());
+        }
+        if (ref == null){
+            condition.setError("Null reference");
+            return false;
+        }
+        else {
+            if (ref != BoolLiteral.class){
+                condition.setError("Invalid condition: expected a boolean ref:" + ref.getSimpleName());
+                return false;
+            }
+            else {
+                return true;
             }
         }
     }
@@ -128,8 +155,8 @@ public class Checker {
     }
 
     private Class<?> getOperationReferenceType(Operation operation) {
-        if (operation.operator == PLUS ||
-                operation.operator == MIN){
+        if (operation.operator == PLUS || operation.operator == MIN ||
+                operation.operator == LT || operation.operator == GT){
             Class<?> refLeft = operation.lhs.getClass();
             Class<?> refRight = operation.rhs.getClass();
 
@@ -147,6 +174,9 @@ public class Checker {
             }
 
             if(refLeft == refRight){
+                if (operation.operator == LT || operation.operator == GT){
+                    return BoolLiteral.class;
+                }
                 return operation.lhs.getClass();
             }
             else {
@@ -165,6 +195,17 @@ public class Checker {
                 }
                 return null;
             }
+        }
+        if (operation.operator == AND || operation.operator == OR){
+            if(!checkCondition(operation.lhs)){
+                operation.lhs.setError("Invalid Boolean expression!");
+                return null;
+            }
+            if(!checkCondition(operation.rhs)){
+                operation.rhs.setError("Invalid Boolean expression!");
+                return null;
+            }
+            return BoolLiteral.class;
         }
         return null;
     }
