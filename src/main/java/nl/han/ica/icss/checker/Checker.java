@@ -1,17 +1,12 @@
 package nl.han.ica.icss.checker;
 
-import java.lang.ref.Reference;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import nl.han.ica.icss.ast.*;
-import nl.han.ica.icss.parser.ICSSParser;
-
-import static nl.han.ica.icss.ast.Operation.Operator.*;
 
 public class Checker {
-
-    public enum ExpressionType { //???
+    public enum ExpressionType { // You have no power here
         PIXELVALUE,
         PERCENTAGE,
         COLORVALUE,
@@ -23,7 +18,6 @@ public class Checker {
     private HashSet<String> pixelDeclarations;
     private HashSet<String> percentageDeclarations;
     private HashSet<String> colorDeclarations;
-
 
 	public void check(AST ast) {
 	    // building style type declarations
@@ -88,7 +82,6 @@ public class Checker {
         for (ASTNode n: stylerule.getChildren()) {
             if (n.getClass() == Declaration.class){
                 checkDeclaration((Declaration) n);
-
             }
         }
     }
@@ -155,8 +148,8 @@ public class Checker {
     }
 
     private Class<?> getOperationReferenceType(Operation operation) {
-        if (operation.operator == PLUS || operation.operator == MIN ||
-                operation.operator == LT || operation.operator == GT){
+        if (operation.operator == Operation.Operator.PLUS || operation.operator == Operation.Operator.MIN ||
+                operation.operator == Operation.Operator.LT || operation.operator == Operation.Operator.GT){
             Class<?> refLeft = operation.lhs.getClass();
             Class<?> refRight = operation.rhs.getClass();
 
@@ -174,7 +167,7 @@ public class Checker {
             }
 
             if(refLeft == refRight){
-                if (operation.operator == LT || operation.operator == GT){
+                if (operation.operator == Operation.Operator.LT || operation.operator == Operation.Operator.GT){
                     return BoolLiteral.class;
                 }
                 return operation.lhs.getClass();
@@ -196,7 +189,7 @@ public class Checker {
                 return null;
             }
         }
-        if (operation.operator == AND || operation.operator == OR){
+        if (operation.operator == Operation.Operator.AND || operation.operator == Operation.Operator.OR){
             if(!checkCondition(operation.lhs)){
                 operation.lhs.setError("Invalid Boolean expression!");
                 return null;
