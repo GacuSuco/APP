@@ -92,9 +92,10 @@ public class ASTListener extends ICSSBaseListener {
 
 	@Override
 	public void enterVariable(ICSSParser.VariableContext ctx) {
-		if (ctx.parent.getChildCount() != 1){ //maakt deel uit van de tree
+		// Wanneer de parent meer dan 1 kind heeft, is de variable een Assignment name
+		// Anders is het gewoon een varaibleReference
+		if (ctx.parent.getChildCount() != 1){
 			((Assignment) currentContainer.peek()).name = new VariableReference(ctx.getText());
-			//((Declaration) currentContainer.peek()).property = ctx.getText();
 		}
 		else {
 			currentContainer.push(new VariableReference(ctx.getText()));
@@ -119,24 +120,20 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void enterVariableDeclaration(ICSSParser.VariableDeclarationContext ctx) {
 		currentContainer.push(new Assignment());
-		//currentContainer.push(new Declaration());
 	}
 	@Override
 	public void exitVariableDeclaration(ICSSParser.VariableDeclarationContext ctx) {
 		ASTNode assignment =  currentContainer.pop();
 		currentContainer.peek().addChild(assignment);
-
-// 		Declaration declaration = ((Declaration) currentContainer.pop());
-//		currentContainer.peek().addChild(declaration);
 	}
 	@Override
 	public void exitExpression(ICSSParser.ExpressionContext ctx) {
-		// kijk naar het aantal children
-		// als een voeg direct to
-		// als meer dan 1 check voor operators op even getalen;
-		// pop die shit
+		// Als expression meerdere kinderen heeft is het een operation.
+		// Anders is het gewoon een declaratie value.
 		if (ctx.getChildCount() > 1){
-
+			// Expression heeft altijd een oneven aantal kinderen.
+			// Dit betekend dat elke even index een operator is.
+			// dus operator index -1 is right ,+1 is left.
 			for (int i = 2; i < ctx.getChildCount(); i+=2) {
 				ASTNode right = this.currentContainer.pop();
 				ASTNode operator = this.currentContainer.pop();
@@ -145,6 +142,9 @@ public class ASTListener extends ICSSBaseListener {
 				((Operation)operator).rhs = (Expression) right;
 				((Operation)operator).lhs = (Expression) left;
 
+				// Als het nog een keer kan lopen moet de operator terug geplaats worden in de stack
+				// zodat het bij de volgende operator gebruikt kan worden.
+				// Anders direct aan declaratie toevoegen.
 				if (i + 2 < ctx.getChildCount()){
 					this.currentContainer.push(operator);
 				}else {
