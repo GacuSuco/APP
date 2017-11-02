@@ -191,7 +191,7 @@ public class Checker {
                         || operation.operator == Operation.Operator.EQ){
                     return BoolLiteral.class;
                 }
-                return operation.lhs.getClass();
+                return refLeft;
             }
             else {
                 if (refLeft != null && refRight != null){
